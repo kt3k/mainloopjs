@@ -1,7 +1,7 @@
 mainloop.js
 ===========
 
-function _mainloop_ creates the mainloop for an application and monitor the fps of it.
+_mainloop_ function creates the mainloop for an application and monitor the fps of it.
 
 ```
 var main = mainloop({
