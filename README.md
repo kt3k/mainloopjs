@@ -14,9 +14,9 @@ var main = mainloop({
   }
 });
 
-main.run(); # run the mainloop.
+main.run(); // run the mainloop.
 
 ...
 
-main.stop(); # stop the mainloop.
+main.stop(); // stop the mainloop.
 ```
