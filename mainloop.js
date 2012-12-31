@@ -17,14 +17,14 @@ this.mainloop = this.exports = function() {
 
         var frameArray = [FPS, FPS, FPS, FPS, FPS, FPS, FPS, FPS, FPS, FPS];
 
-        var timeStart = (new Date).getTime();
+        var timeStart = (new Date()).getTime();
         var timeStartPrev = timeStart - FPS;
 
         var frameFunc = typeof args.frameFunc === "function" ? args.frameFunc : nop;
         var frameMonitor = typeof args.frameMonitor === "function" ? args.frameMonitor : nop;
 
         var main = function() {
-            timeStart = (new Date).getTime();
+            timeStart = (new Date()).getTime();
 
             frameArray.shift();
             frameArray.push(timeStart - timeStartPrev);
@@ -34,7 +34,7 @@ this.mainloop = this.exports = function() {
             frameFunc(count++);
 
             if (isRunning) {
-                setTimeout(main, FRAME - (timeStart - (new Date).getTime()));
+                setTimeout(main, FRAME - (timeStart - (new Date()).getTime()));
             }
 
         };
@@ -60,7 +60,7 @@ this.mainloop = this.exports = function() {
                 isRunning = false;
                 return this;
             }
-        }
+        };
     };
 
     return exports;
