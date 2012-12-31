@@ -5,16 +5,25 @@ module.exports = (grunt) ->
 
     jshint:
       src:
-        src:
+        src: [
           'mainloop.js'
+        ]
         options:
           jshintrc: '.jshintrc'
 
     qunit:
-      mainloopjs:
+      mainloopjs: [
         'test/index.html'
+      ]
 
-  grunt.loadNpmTasks 'grunt-contrib-jshint'
-  grunt.loadNpmTasks 'grunt-contrib-qunit'
+  [
+    'grunt-contrib-jshint'
+    'grunt-contrib-qunit'
+    'grunt-contrib-connect'
+  ]
+  .forEach grunt.loadNpmTasks
 
-  grunt.registerTask 'default', ['jshint', 'qunit']
+  grunt.registerTask 'default', [
+    'jshint'
+    'qunit'
+  ]
