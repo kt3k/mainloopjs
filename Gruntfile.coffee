@@ -4,8 +4,12 @@ module.exports = (grunt) ->
   grunt.initConfig
     jshint:
       src:
-        src: ['mainloop.js']
+        src:
+          'mainloop.js'
+        options:
+          jshintrc: '.jshintrc'
 
-  grunt.loadNpmTasks ['grunt-contrib-jshint']
+  grunt.loadNpmTasks 'grunt-contrib-jshint'
 
-  grunt.registerTask 'default', ['jshint']
+  grunt.registerTask 'default',
+    'jshint'

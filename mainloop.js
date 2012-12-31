@@ -4,27 +4,36 @@
  * license: MIT license
  */
 
-this.mainloop = this.exports = function() {
+this.mainloop = this.exports = function (window) {
+    'use strict';
 
-    var nop = function() {};
+    var nop = function () {};
 
-    var exports = function(args) {
+    var funcOrNop = function (func) {
+        return typeof func === 'function' ? func : nop;
+    };
 
-        var count = typeof args.count === "number" ? args.count : 0;
+    var getTime = function () {
+        return +new Date();
+    };
+
+    var exports = function (args) {
+
+        var count = typeof args.count === 'number' ? args.count : 0;
         var FPS = args.fps || 30;
         var FRAME = 1000 / FPS;
         var isRunning = false;
 
         var frameArray = [FPS, FPS, FPS, FPS, FPS, FPS, FPS, FPS, FPS, FPS];
 
-        var timeStart = (new Date()).getTime();
+        var timeStart = getTime();
         var timeStartPrev = timeStart - FPS;
 
-        var frameFunc = typeof args.frameFunc === "function" ? args.frameFunc : nop;
-        var frameMonitor = typeof args.frameMonitor === "function" ? args.frameMonitor : nop;
+        var frameFunc = funcOrNop(args.frameFunc);
+        var frameMonitor = funcOrNop(args.frameMonitor);
 
-        var main = function() {
-            timeStart = (new Date()).getTime();
+        var main = function () {
+            timeStart = getTime();
 
             frameArray.shift();
             frameArray.push(timeStart - timeStartPrev);
@@ -34,12 +43,12 @@ this.mainloop = this.exports = function() {
             frameFunc(count++);
 
             if (isRunning) {
-                setTimeout(main, FRAME - (timeStart - (new Date()).getTime()));
+                window.setTimeout(main, FRAME - (timeStart - getTime()));
             }
 
         };
 
-        setInterval(function(){
+        window.setInterval(function () {
             for (var i = 0, sum = 0, len = frameArray.length; i < len; i++) {
                 sum += frameArray[i];
             }
@@ -48,7 +57,7 @@ this.mainloop = this.exports = function() {
         }, 100);
 
         return {
-            run: function() {
+            run: function () {
                 if (!isRunning) {
                     isRunning = true;
                     main();
@@ -56,7 +65,7 @@ this.mainloop = this.exports = function() {
                 return this;
             },
 
-            stop: function() {
+            stop: function () {
                 isRunning = false;
                 return this;
             }
@@ -65,4 +74,4 @@ this.mainloop = this.exports = function() {
 
     return exports;
 
-}();
+}(this);
