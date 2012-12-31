@@ -1,0 +1,27 @@
+{
+  "name": "mainloopjs",
+  "version": "1.0.0",
+  "description": "mainloop for client side javascript.",
+  "main": "mainloop.js",
+  "scripts": {
+    "test": "grunt"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/kt3k/mainloopjs.git"
+  },
+  "keywords": [
+    "javascript",
+    "mainloop",
+    "game",
+    "real-time"
+  ],
+  "author": "kt3k",
+  "license": "MIT",
+  "gitHead": "580a43a0c24dfd338a910da700325d4bb24b8464",
+  "readmeFilename": "README.md",
+  "devDependencies": {
+    "grunt": "~0.4.0rc4",
+    "grunt-contrib-jshint": "~0.1.0"
+  }
+}
