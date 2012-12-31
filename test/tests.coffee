@@ -5,10 +5,10 @@ test 'basic', ->
   ok typeof mainloop({}) is 'object', 'mainloop({}) is a object.'
 
 asyncTest 'fps 30', ->
-  expect(6)
+  expect(5)
   i = 0
 
-  m = mainloop
+  mainloop
     fps: 30
     frameMonitor: (fps, arr, cnt) ->
       i += 1
@@ -17,18 +17,17 @@ asyncTest 'fps 30', ->
         ok 28 <= fps && fps <= 32, "fps is about 30. (iteration #{i}, fps=#{fps}, #{arr}, #{cnt})"
 
       if i >= 14
-        m.stop()
-        ok !m.isRunning(), 'mainloop is stopped.'
-        mainloop frameMonitor: ->
+        mainloop.stop()
+        mainloop.removeFrameMonitor()
         start()
 
-  m.run()
+  mainloop.run()
 
 asyncTest 'fps 60', ->
   expect(5)
   i = 0
 
-  m = mainloop
+  mainloop
     fps: 60
     frameMonitor: (fps, arr, cnt) ->
       i += 1
@@ -37,8 +36,8 @@ asyncTest 'fps 60', ->
         ok 58 <= fps && fps <= 62, "fps is about 60. (iteration #{i}, fps=#{fps}, #{arr}, #{cnt})"
 
       if i >= 14
-        m.stop()
-        mainloop frameMonitor: ->
+        mainloop.stop()
+        mainloop.removeFrameMonitor()
         start()
 
-  m.run()
+  mainloop.run()
