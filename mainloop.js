@@ -15,6 +15,9 @@ this.mainloop = this.exports = function (window) {
     };
 
     // module variables
+
+    var isRunning = false;
+
     var instance = {
         run: function () {
             if (!isRunning) {
@@ -25,12 +28,24 @@ this.mainloop = this.exports = function (window) {
         },
 
         stop: function () {
+            if (mainTimer != null) {
+                window.clearInterval(mainTimer);
+                mainTimer = null;
+            }
             isRunning = false;
             return this;
+        },
+
+        isRunning: function () {
+            return isRunning;
         }
     };
 
     var frameMonitorTimer = null;
+    var frameFunc = nop;
+
+    var mainTimer = null;
+
     var count = 0;
     var FPS = 30;
     var FRAME = 1000 / FPS;
@@ -38,9 +53,7 @@ this.mainloop = this.exports = function (window) {
     var timeStart = 0;
     var timeStartPrev = 0;
 
-    var isRunning = false;
 
-    var frameFunc = nop;
 
     // module funcs
 
@@ -55,7 +68,7 @@ this.mainloop = this.exports = function (window) {
         frameFunc(count++);
 
         if (isRunning) {
-            window.setTimeout(main, FRAME - (timeStart - getTime()));
+            mainTimer = window.setTimeout(main, FRAME - (timeStart - getTime()));
         }
     };
 
@@ -70,23 +83,29 @@ this.mainloop = this.exports = function (window) {
             return;
         }
 
-        if (frameMonitorTimer != null) {
-            // remove the older frameMonitor
-            // because there should be only one frameMonitor for the mainloop.
-            window.clearInterval(frameMonitorTimer);
-        }
+        // remove the older frameMonitor
+        // because there should be only one frameMonitor for the mainloop.
+        removeFrameMonitor();
 
         frameMonitorTimer = window.setInterval(function () {
             for (var i = 0, sum = 0, len = frameArray.length; i < len; i++) {
                 sum += frameArray[i];
             }
 
-            frameMonitor(Math.round(1000 * len / sum));
+            frameMonitor(Math.round(1000 * len / sum), JSON.stringify(frameArray), count);
         }, 100);
+    };
+
+    var removeFrameMonitor = function () {
+        if (frameMonitorTimer != null) {
+            window.clearInterval(frameMonitorTimer);
+            frameMonitorTimer = null;
+        }
     };
 
     var exports = function (args) {
 
+        args || (args = {});
         count = args.count instanceof Number ? args.count : count;
         FPS = args.fps || FPS;
         FRAME = 1000 / FPS;
@@ -100,6 +119,13 @@ this.mainloop = this.exports = function (window) {
         return instance;
     };
 
-    return exports;
+    exports.removeFrameMonitor = removeFrameMonitor;
 
+    Object.keys(instance).forEach(function (method) {
+        exports[method] = function () {
+            instance[method]();
+        };
+    });
+
+    return exports;
 }(this);
