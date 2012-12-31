@@ -7,69 +7,97 @@
 this.mainloop = this.exports = function (window) {
     'use strict';
 
+    // static util funcs
     var nop = function () {};
-
-    var funcOrNop = function (func) {
-        return typeof func === 'function' ? func : nop;
-    };
 
     var getTime = function () {
         return +new Date();
     };
 
-    var exports = function (args) {
-
-        var count = typeof args.count === 'number' ? args.count : 0;
-        var FPS = args.fps || 30;
-        var FRAME = 1000 / FPS;
-        var isRunning = false;
-
-        var frameArray = [FPS, FPS, FPS, FPS, FPS, FPS, FPS, FPS, FPS, FPS];
-
-        var timeStart = getTime();
-        var timeStartPrev = timeStart - FPS;
-
-        var frameFunc = funcOrNop(args.frameFunc);
-        var frameMonitor = funcOrNop(args.frameMonitor);
-
-        var main = function () {
-            timeStart = getTime();
-
-            frameArray.shift();
-            frameArray.push(timeStart - timeStartPrev);
-
-            timeStartPrev = timeStart;
-
-            frameFunc(count++);
-
-            if (isRunning) {
-                window.setTimeout(main, FRAME - (timeStart - getTime()));
+    // module variables
+    var instance = {
+        run: function () {
+            if (!isRunning) {
+                isRunning = true;
+                main();
             }
+            return this;
+        },
 
-        };
+        stop: function () {
+            isRunning = false;
+            return this;
+        }
+    };
 
-        window.setInterval(function () {
+    var frameMonitorTimer = null;
+    var count = 0;
+    var FPS = 30;
+    var FRAME = 1000 / FPS;
+    var frameArray = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+    var timeStart = 0;
+    var timeStartPrev = 0;
+
+    var isRunning = false;
+
+    var frameFunc = nop;
+
+    // module funcs
+
+    var main = function () {
+        timeStart = getTime();
+
+        frameArray.shift();
+        frameArray.push(timeStart - timeStartPrev);
+
+        timeStartPrev = timeStart;
+
+        frameFunc(count++);
+
+        if (isRunning) {
+            window.setTimeout(main, FRAME - (timeStart - getTime()));
+        }
+    };
+
+    var setFrameFunc = function (func) {
+        if (typeof func === 'function') {
+            frameFunc = func;
+        }
+    };
+
+    var setFrameMonitor = function (frameMonitor) {
+        if (typeof frameMonitor !== 'function') {
+            return;
+        }
+
+        if (frameMonitorTimer != null) {
+            // remove the older frameMonitor
+            // because there should be only one frameMonitor for the mainloop.
+            window.clearInterval(frameMonitorTimer);
+        }
+
+        frameMonitorTimer = window.setInterval(function () {
             for (var i = 0, sum = 0, len = frameArray.length; i < len; i++) {
                 sum += frameArray[i];
             }
 
             frameMonitor(Math.round(1000 * len / sum));
         }, 100);
+    };
 
-        return {
-            run: function () {
-                if (!isRunning) {
-                    isRunning = true;
-                    main();
-                }
-                return this;
-            },
+    var exports = function (args) {
 
-            stop: function () {
-                isRunning = false;
-                return this;
-            }
-        };
+        count = args.count instanceof Number ? args.count : count;
+        FPS = args.fps || FPS;
+        FRAME = 1000 / FPS;
+
+        timeStart = getTime();
+        timeStartPrev = timeStart - FPS;
+
+        setFrameFunc(args.frameFunc);
+        setFrameMonitor(args.frameMonitor);
+
+        return instance;
     };
 
     return exports;
