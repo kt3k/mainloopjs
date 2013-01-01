@@ -1,10 +1,15 @@
 
-test 'basic', ->
+test 'basic properties', ->
   ok typeof mainloop is 'function', 'mainloop is defined and is a function.'
   ok typeof mainloop() is 'object', 'mainloop() is a object.'
   ok typeof mainloop({}) is 'object', 'mainloop({}) is a object.'
 
-testFps = (fpsToSet, min, max, fpsLabel) ->
+test 'mainloop object is singleton', ->
+  ok mainloop() is mainloop(), 'mainloop() === mainloop().'
+  ok mainloop() is mainloop(frameFunc: ->), 'mainloop() === mainloop({frameFunc: function () {}}).'
+  ok mainloop() is mainloop(frameMonitor: ->), 'mainloop() === mainloop({frameMonitor: function () {}}).'
+
+testFps = (fpsToSet, min, max, fpsLabel, callback) ->
   i = 0
 
   mainloop
@@ -18,23 +23,29 @@ testFps = (fpsToSet, min, max, fpsLabel) ->
       if i >= 14
         mainloop.stop()
         mainloop.removeFrameMonitor()
-        start()
+
+        callback?()
 
   mainloop.run()
 
 asyncTest 'initial fps default is 30', ->
   expect(5)
-  testFps undefined, 28, 32, 30
+  testFps undefined, 28, 32, 30, ->
+    start()
 
 asyncTest 'fps 30', ->
   expect(5)
-  testFps 30, 28, 32, 30
+  testFps 30, 28, 32, 30, ->
+    start()
 
 asyncTest 'fps 60', ->
   expect(5)
-  testFps 60, 57, 63, 60
+  testFps 60, 57, 63, 60, ->
+    start()
 
 asyncTest 'fps default is previous fps', ->
-  expect(5)
-  testFps undefined, 57, 63, 60
+  expect(10)
+  testFps 45, 43, 47, 45, ->
+    testFps undefined, 43, 47, 45, ->
+      start()
 
