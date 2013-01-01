@@ -92,7 +92,7 @@ this.mainloop = this.exports = function (window) {
                 sum += frameArray[i];
             }
 
-            frameMonitor(Math.round(1000 * len / sum), JSON.stringify(frameArray), count);
+            frameMonitor(Math.round(1000 * len / sum), frameArray, count);
         }, 100);
     };
 

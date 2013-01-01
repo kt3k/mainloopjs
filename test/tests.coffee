@@ -4,17 +4,16 @@ test 'basic', ->
   ok typeof mainloop() is 'object', 'mainloop() is a object.'
   ok typeof mainloop({}) is 'object', 'mainloop({}) is a object.'
 
-asyncTest 'fps 30', ->
-  expect(5)
+testFps = (fpsToSet, min, max, fpsLabel) ->
   i = 0
 
   mainloop
-    fps: 30
+    fps: fpsToSet
     frameMonitor: (fps, arr, cnt) ->
       i += 1
 
       if i >= 10
-        ok 28 <= fps && fps <= 32, "fps is about 30. (iteration #{i}, fps=#{fps}, #{arr}, #{cnt})"
+        ok min <= fps && fps <= max, "fps is about #{fpsLabel} (#{min} <= fps && fps <= #{max}). (iteration #{i}, fps=#{fps}, #{JSON.stringify(arr)}, #{cnt})"
 
       if i >= 14
         mainloop.stop()
@@ -22,22 +21,20 @@ asyncTest 'fps 30', ->
         start()
 
   mainloop.run()
+
+asyncTest 'initial fps default is 30', ->
+  expect(5)
+  testFps undefined, 28, 32, 30
+
+asyncTest 'fps 30', ->
+  expect(5)
+  testFps 30, 28, 32, 30
 
 asyncTest 'fps 60', ->
   expect(5)
-  i = 0
+  testFps 60, 57, 63, 60
 
-  mainloop
-    fps: 60
-    frameMonitor: (fps, arr, cnt) ->
-      i += 1
+asyncTest 'fps default is previous fps', ->
+  expect(5)
+  testFps undefined, 57, 63, 60
 
-      if i >= 10
-        ok 58 <= fps && fps <= 62, "fps is about 60. (iteration #{i}, fps=#{fps}, #{arr}, #{cnt})"
-
-      if i >= 14
-        mainloop.stop()
-        mainloop.removeFrameMonitor()
-        start()
-
-  mainloop.run()
