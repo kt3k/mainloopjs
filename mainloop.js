@@ -36,6 +36,17 @@ this.mainloop = this.exports = function (window) {
             return this;
         },
 
+        reset: function () {
+            exports({
+                count: 0,
+                frameFunc: nop,
+                fpt: FPS
+            });
+            removeFrameMonitor();
+
+            this.stop();
+        },
+
         isRunning: function () {
             return isRunning;
         }

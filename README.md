@@ -52,3 +52,4 @@ Methods
  `stop`               | stop the mainloop. (if mainloop is already stopped, then do nothing.)
  `removeFrameMonitor` | remove the frameMonitor function.
  `isRunning`          | return true if the mainloop is running and return false if it's not.
+ `reset`              | reset everything.
