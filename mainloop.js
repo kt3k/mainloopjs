@@ -4,7 +4,7 @@
  * license: MIT license
  */
 
-this.mainloop = this.exports = function (window) {
+this.mainloop = this.exports = (function (window) {
     'use strict';
 
     // static util funcs
@@ -139,4 +139,4 @@ this.mainloop = this.exports = function (window) {
     });
 
     return exports;
-}(this);
+}(this));
