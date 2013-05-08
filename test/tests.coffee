@@ -9,6 +9,34 @@ test 'mainloop object is singleton', ->
   ok mainloop() is mainloop(frameFunc: ->), 'mainloop() === mainloop({frameFunc: function () {}}).'
   ok mainloop() is mainloop(frameMonitor: ->), 'mainloop() === mainloop({frameMonitor: function () {}}).'
 
+asyncTest 'frameMonitor invoked at least once', ->
+  expect(1)
+
+  inst = mainloop(
+    frameMonitor: ->
+      ok true, 'frameMonitor invoked at least once.'
+      inst.stop()
+      inst.removeFrameMonitor()
+      start()
+  ).run()
+
+asyncTest 'frameMonitor called about 10 times a second', ->
+  expect(1)
+
+  i = 0
+
+  inst = mainloop(
+    frameMonitor: ->
+      i += 1
+  ).run()
+
+  setTimeout ->
+    inst.stop()
+    inst.removeFrameMonitor()
+    ok 9 <= i <= 11, 'frameMonitor called abount 10 times a second.'
+    start()
+  , 1000
+
 testFps = (fpsToSet, min, max, fpsLabel, callback) ->
   i = 0
 
