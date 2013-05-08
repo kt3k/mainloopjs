@@ -7,136 +7,140 @@
 this.mainloop = this.exports = (function (window) {
     'use strict';
 
-    // static util funcs
     var nop = function () {};
 
-    var getTime = function () {
-        return +new Date();
+    var instance = null;
+
+    var exports = function (args) {
+        return new Mainloop(args);
     };
 
-    // module variables
+    var Mainloop = function (args) {
+        if (instance) {
+            instance.setArgs(args);
+            return instance;
+        }
 
-    var isRunning = false;
+        this.frameFuncs = [];
+        this.frameArray = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
 
-    var instance = {
-        run: function () {
-            if (!isRunning) {
-                isRunning = true;
-                main();
-            }
-            return this;
-        },
+        this.timeStart = (new Date()).getTime();
+        this.timeStartPrev = this.timeStart - this.FPS;
 
-        stop: function () {
-            if (mainTimer != null) {
-                window.clearInterval(mainTimer);
-                mainTimer = null;
-            }
-            isRunning = false;
-            return this;
-        },
+        this.isRunning = false;
 
-        reset: function () {
-            exports({
-                count: 0,
-                frameFunc: nop,
-                fpt: FPS
-            });
-            removeFrameMonitor();
+        this.frameMonitorTimer = null;
+        this.frameMonitor = nop;
+        this.mainTimer = null;
 
-            this.stop();
-        },
+        this.setArgs(args);
 
-        isRunning: function () {
-            return isRunning;
+        instance = this;
+    };
+
+    var mainloopPrototype = Mainloop.prototype = exports.prototype = {constructor: Mainloop};
+
+    mainloopPrototype.setArgs = function (args) {
+        args || (args = {});
+        this.count = args.count ? +args.count : 0;
+        this.FPS = args.fps || this.FPS || 30;
+        this.FRAME = 1000 / this.FPS;
+
+        this.addFrameFunc(args.frameFunc);
+        this.setFrameMonitor(args.frameMonitor);
+    };
+
+    mainloopPrototype.run = function () {
+        if (!this.isRunning) {
+            this.isRunning = true;
+            __main__();
+        }
+
+        return this;
+    };
+
+    mainloopPrototype.stop = function () {
+        if (this.mainTimer != null) {
+            window.clearInterval(this.mainTimer);
+            this.mainTimer = null;
+        }
+
+        this.isRunning = false;
+
+        return this;
+    };
+
+    mainloopPrototype.reset = function () {
+        exports({
+            count: 0,
+            frameFunc: nop,
+            fps: this.FPS
+        });
+
+        this.removeFrameMonitor();
+
+        this.stop();
+
+        return this;
+    };
+
+    // main loop function
+
+    var __main__ = function () {
+        instance.timeStart = (new Date()).getTime();
+
+        instance.frameArray.shift();
+        instance.frameArray.push(instance.timeStart - instance.timeStartPrev);
+
+        instance.timeStartPrev = instance.timeStart;
+
+        instance.count ++;
+
+        instance.frameFuncs.forEach(function (func) {
+            func(instance.count);
+        });
+
+        if (instance.isRunning) {
+            instance.mainTimer = window.setTimeout(__main__, instance.FRAME - (instance.timeStart - (new Date()).getTime()));
         }
     };
 
-    var frameMonitorTimer = null;
-    var frameFunc = nop;
-
-    var mainTimer = null;
-
-    var count = 0;
-    var FPS = 30;
-    var FRAME = 1000 / FPS;
-    var frameArray = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
-    var timeStart = 0;
-    var timeStartPrev = 0;
-
-
-
-    // module funcs
-
-    var main = function () {
-        timeStart = getTime();
-
-        frameArray.shift();
-        frameArray.push(timeStart - timeStartPrev);
-
-        timeStartPrev = timeStart;
-
-        frameFunc(count++);
-
-        if (isRunning) {
-            mainTimer = window.setTimeout(main, FRAME - (timeStart - getTime()));
-        }
-    };
-
-    var setFrameFunc = function (func) {
+    mainloopPrototype.addFrameFunc = function (func) {
         if (typeof func === 'function') {
-            frameFunc = func;
+            this.frameFuncs.push(func);
         }
     };
 
-    var setFrameMonitor = function (frameMonitor) {
+    mainloopPrototype.removeFrameFunc = function (func) {
+        if (this.frameFuncs.indexOf(func) >= 0) {
+            this.frameFuncs.splice(this.frameFuncs.indexOf(func), 1);
+        }
+    };
+
+    mainloopPrototype.setFrameMonitor = function (frameMonitor) {
         if (typeof frameMonitor !== 'function') {
             return;
         }
 
-        // remove the older frameMonitor
-        // because there should be only one frameMonitor for the mainloop.
-        removeFrameMonitor();
+        // remove an older frameMonitor
+        // there is only one frameMonitor
+        this.removeFrameMonitor();
 
-        frameMonitorTimer = window.setInterval(function () {
-            for (var i = 0, sum = 0, len = frameArray.length; i < len; i++) {
-                sum += frameArray[i];
+        this.frameMonitorTimer = window.setInterval(function () {
+            for (var i = 0, sum = 0, len = instance.frameArray.length; i < len; i++) {
+                sum += instance.frameArray[i];
             }
 
-            frameMonitor(Math.round(1000 * len / sum), frameArray, count);
+            frameMonitor(Math.round(1000 * len / sum), instance.frameArray, instance.count);
         }, 100);
     };
 
-    var removeFrameMonitor = function () {
-        if (frameMonitorTimer != null) {
-            window.clearInterval(frameMonitorTimer);
-            frameMonitorTimer = null;
+    mainloopPrototype.removeFrameMonitor = function () {
+        if (this.frameMonitorTimer != null) {
+            window.clearInterval(this.frameMonitorTimer);
+            this.frameMonitorTimer = null;
         }
     };
-
-    var exports = function (args) {
-
-        args || (args = {});
-        count = args.count instanceof Number ? args.count : count;
-        FPS = args.fps || FPS;
-        FRAME = 1000 / FPS;
-
-        timeStart = getTime();
-        timeStartPrev = timeStart - FPS;
-
-        setFrameFunc(args.frameFunc);
-        setFrameMonitor(args.frameMonitor);
-
-        return instance;
-    };
-
-    exports.removeFrameMonitor = removeFrameMonitor;
-
-    Object.keys(instance).forEach(function (method) {
-        exports[method] = function () {
-            instance[method]();
-        };
-    });
 
     return exports;
 }(this));

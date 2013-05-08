@@ -12,7 +12,7 @@ test 'mainloop object is singleton', ->
 testFps = (fpsToSet, min, max, fpsLabel, callback) ->
   i = 0
 
-  mainloop
+  instance = mainloop(
     fps: fpsToSet
     frameMonitor: (fps, arr, cnt) ->
       i += 1
@@ -21,12 +21,11 @@ testFps = (fpsToSet, min, max, fpsLabel, callback) ->
         ok min <= fps && fps <= max, "fps is about #{fpsLabel} (#{min} <= fps && fps <= #{max}). (iteration #{i}, fps=#{fps}, #{JSON.stringify(arr)}, #{cnt})"
 
       if i >= 14
-        mainloop.stop()
-        mainloop.removeFrameMonitor()
+        instance.stop()
+        instance.removeFrameMonitor()
 
         callback?()
-
-  mainloop.run()
+  ).run()
 
 asyncTest 'initial fps default is 30', ->
   expect(5)
