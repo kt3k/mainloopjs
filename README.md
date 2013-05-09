@@ -40,8 +40,8 @@ Parameters
  name          | description
 ---------------|------------
  `frameFunc`   | function to be executed each frame.
- `monitorFunc` | function to be executed every .1 sec with arguments[0] as mainloop's fps. (the value is average of latest 10 frames.)
- `fps`         | fps to run the mainloop.
+ `monitorFunc` | function to be executed every 100 msec with arguments[0] as mainloop's fps. (the value is average of latest 10 frames.)
+ `frameRate`   | frame rate to run the mainloop.
 
 Methods
 -------
@@ -50,6 +50,7 @@ Methods
 ----------------------|---------
  `run`                | run the mainloop. (if mainloop is already running, do nothing.)
  `stop`               | stop the mainloop. (if mainloop is already stopped, then do nothing.)
+ `addFrameFunc`       | add a frame function.
+ `removeFrameFunc`    | remove a frame funcion.
  `removeFrameMonitor` | remove the frameMonitor function.
- `isRunning`          | return true if the mainloop is running and return false if it's not.
- `reset`              | reset everything.
+ `reset`              | stop the mainloop and remove frame functions and frame monitor function.
