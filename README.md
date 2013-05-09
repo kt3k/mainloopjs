@@ -17,7 +17,7 @@ Call `mainloop` function to initialize the mainloop and then call `mainloop.run`
 var i = 0;
 
 mainloop({
-  fps: 30,
+  frameRate: 30,
 
   frameFunc: function () {
     i += 1;
