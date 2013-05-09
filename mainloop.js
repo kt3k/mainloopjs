@@ -154,5 +154,13 @@ this.mainloop = this.exports = (function (window) {
         return this;
     };
 
+    // link methods
+    Object.keys(mainloopPrototype).forEach(function (key) {
+        exports[key] = function () {
+            var inst = exports();
+            inst[key].apply(inst, arguments);
+        };
+    });
+
     return exports;
 }(this));
