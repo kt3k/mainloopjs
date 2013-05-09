@@ -24,16 +24,16 @@ this.mainloop = this.exports = (function (window) {
         this.frameFuncs = [];
         this.frameArray = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
 
+        this.setArgs(args);
+
         this.timeStart = (new Date()).getTime();
-        this.timeStartPrev = this.timeStart - this.FPS;
+        this.timeStartPrev = this.timeStart - this.FRAME;
 
         this.isRunning = false;
 
         this.frameMonitorTimer = null;
         this.frameMonitor = nop;
         this.mainTimer = null;
-
-        this.setArgs(args);
 
         instance = this;
     };
@@ -48,6 +48,8 @@ this.mainloop = this.exports = (function (window) {
 
         this.addFrameFunc(args.frameFunc);
         this.setFrameMonitor(args.frameMonitor);
+
+        return this;
     };
 
     mainloopPrototype.run = function () {
@@ -109,12 +111,22 @@ this.mainloop = this.exports = (function (window) {
         if (typeof func === 'function') {
             this.frameFuncs.push(func);
         }
+
+        return this;
     };
 
     mainloopPrototype.removeFrameFunc = function (func) {
         if (this.frameFuncs.indexOf(func) >= 0) {
             this.frameFuncs.splice(this.frameFuncs.indexOf(func), 1);
         }
+
+        return this;
+    };
+
+    mainloopPrototype.clearFrameFuncs = function () {
+        this.frameFuncs = [];
+
+        return this;
     };
 
     mainloopPrototype.setFrameMonitor = function (frameMonitor) {
@@ -133,6 +145,8 @@ this.mainloop = this.exports = (function (window) {
 
             frameMonitor(Math.round(1000 * len / sum), instance.frameArray, instance.count);
         }, 100);
+
+        return this;
     };
 
     mainloopPrototype.removeFrameMonitor = function () {
@@ -140,6 +154,8 @@ this.mainloop = this.exports = (function (window) {
             window.clearInterval(this.frameMonitorTimer);
             this.frameMonitorTimer = null;
         }
+
+        return this;
     };
 
     return exports;

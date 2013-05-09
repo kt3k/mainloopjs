@@ -37,6 +37,38 @@ asyncTest 'frameMonitor called about 10 times a second', ->
     start()
   , 1000
 
+asyncTest 'clearFrameFuncs', ->
+  expect(1)
+
+  i = 0
+
+  mainloop(
+    frameFunc: ->
+      i += 1
+  ).clearFrameFuncs().run()
+
+  setTimeout ->
+    ok i is 0, 'frameFuncs is not called.'
+    start()
+    mainloop().stop()
+  , 200
+
+asyncTest 'clearFrameFuncs', ->
+  expect(1)
+
+  i = 0
+
+  frameFunc = ->
+    i += 1
+
+  mainloop(frameFunc: frameFunc).removeFrameFunc(frameFunc).run()
+
+  setTimeout ->
+    ok i is 0, 'frameFuncs is not called.'
+    start()
+    mainloop().stop()
+  , 200
+
 testFps = (fpsToSet, min, max, fpsLabel, callback) ->
   i = 0
 
