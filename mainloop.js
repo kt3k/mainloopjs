@@ -7,8 +7,6 @@
 this.mainloop = this.exports = (function (window) {
     'use strict';
 
-    var nop = function () {};
-
     var instance = null;
 
     var exports = function (args) {
@@ -32,7 +30,7 @@ this.mainloop = this.exports = (function (window) {
         this.isRunning = false;
 
         this.frameMonitorTimer = null;
-        this.frameMonitor = nop;
+        this.frameMonitor = function () {};
         this.mainTimer = null;
 
         instance = this;
