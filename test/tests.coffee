@@ -15,8 +15,7 @@ asyncTest 'frameMonitor invoked at least once', ->
   inst = mainloop(
     frameMonitor: ->
       ok true, 'frameMonitor invoked at least once.'
-      inst.stop()
-      inst.removeFrameMonitor()
+      mainloop().reset()
       start()
   ).run()
 
@@ -31,8 +30,7 @@ asyncTest 'frameMonitor called about 10 times a second', ->
   ).run()
 
   setTimeout ->
-    inst.stop()
-    inst.removeFrameMonitor()
+    mainloop().reset
     ok 9 <= i <= 11, 'frameMonitor called abount 10 times a second.'
     start()
   , 1000
@@ -50,7 +48,7 @@ asyncTest 'clearFrameFuncs', ->
   setTimeout ->
     ok i is 0, 'frameFuncs is not called.'
     start()
-    mainloop().stop()
+    mainloop().reset()
   , 200
 
 asyncTest 'clearFrameFuncs', ->
@@ -66,7 +64,7 @@ asyncTest 'clearFrameFuncs', ->
   setTimeout ->
     ok i is 0, 'frameFuncs is not called.'
     start()
-    mainloop().stop()
+    mainloop().reset()
   , 200
 
 testFps = (fpsToSet, min, max, fpsLabel, callback) ->
@@ -81,8 +79,7 @@ testFps = (fpsToSet, min, max, fpsLabel, callback) ->
         ok min <= fps && fps <= max, "fps is about #{fpsLabel} (#{min} <= fps && fps <= #{max}). (iteration #{i}, fps=#{fps}, #{JSON.stringify(arr)}, #{cnt})"
 
       if i >= 14
-        instance.stop()
-        instance.removeFrameMonitor()
+        mainloop().reset()
 
         callback?()
   ).run()

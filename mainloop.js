@@ -73,11 +73,9 @@ this.mainloop = this.exports = (function (window) {
     };
 
     mainloopPrototype.reset = function () {
-        exports({
-            count: 0,
-            frameFunc: nop,
-            fps: this.FPS
-        });
+        this.setArgs({count: 0});
+
+        this.clearFrameFuncs();
 
         this.removeFrameMonitor();
 
