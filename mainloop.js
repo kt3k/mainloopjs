@@ -25,7 +25,7 @@ this.mainloop = this.exports = (function (window) {
         this.setArgs(args);
 
         this.timeStart = (new Date()).getTime();
-        this.timeStartPrev = this.timeStart - this.FRAME;
+        this.timeStartPrev = this.timeStart - this.frameDuration;
 
         this.isRunning = false;
 
@@ -41,8 +41,8 @@ this.mainloop = this.exports = (function (window) {
     mainloopPrototype.setArgs = function (args) {
         args || (args = {});
         this.count = args.count ? +args.count : 0;
-        this.FPS = args.fps || this.FPS || 30;
-        this.FRAME = 1000 / this.FPS;
+        this.frameRate = args.frameRate || this.frameRate || 30;
+        this.frameDuration = 1000 / this.frameRate;
 
         this.addFrameFunc(args.frameFunc);
         this.setFrameMonitor(args.frameMonitor);
@@ -99,7 +99,7 @@ this.mainloop = this.exports = (function (window) {
         });
 
         if (instance.isRunning) {
-            instance.mainTimer = window.setTimeout(__main__, instance.FRAME - (instance.timeStart - (new Date()).getTime()));
+            instance.mainTimer = window.setTimeout(__main__, instance.frameDuration - (instance.timeStart - (new Date()).getTime()));
         }
     };
 

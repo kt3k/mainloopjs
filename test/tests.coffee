@@ -71,7 +71,7 @@ testFps = (fpsToSet, min, max, fpsLabel, callback) ->
   i = 0
 
   instance = mainloop(
-    fps: fpsToSet
+    frameRate: fpsToSet
     frameMonitor: (fps, arr, cnt) ->
       i += 1
 
