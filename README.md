@@ -1,6 +1,8 @@
 mainloop.js
 ===========
 
+[![Build Status](https://travis-ci.org/kt3k/mainloopjs.png?branch=master)](https://travis-ci.org/kt3k/mainloopjs)
+
 _mainloop.js_ provides the functionality to make the mainloop of an application and to monitor the fps of it.
 
 How to Use
